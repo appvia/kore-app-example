@@ -22,7 +22,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 0
+      maxUnavailable: 1
   selector:
     matchLabels:
       name: app
@@ -60,6 +60,8 @@ spec:
           value: "127.0.0.1"
         - name: PROXY_SERVICE_PORT
           value: "8080"
+        - name: NAXSI_USE_DEFAULT_RULES
+          value: "FALSE"
         ports:
         - name: https
           containerPort: 10443
@@ -68,8 +70,7 @@ spec:
             path: /
             port: 10443
             scheme: HTTPS
-          initialDelaySeconds: 5
-          successThreshold: 3
+          successThreshold: 1
           timeoutSeconds: 5
         livenessProbe:
           httpGet:

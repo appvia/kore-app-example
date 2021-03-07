@@ -3,7 +3,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    cert-manager.io/cluster-issuer: "prod-le-http01"
+    cert-manager.io/cluster-issuer: "prod-le"
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
@@ -35,7 +35,26 @@ spec:
   - from:
     - namespaceSelector:
         matchLabels:
-          name: kore-ingress
+          "kore.appvia.io/name": kore-ingress
     ports:
     - protocol: TCP
       port: 10443
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cert-issuer
+spec:
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          "kore.appvia.io/name": kore-ingress
+    ports:
+      - protocol: TCP
+        port: 8089
+  podSelector:
+    matchLabels:
+      "acme.cert-manager.io/http01-solver": "true"
+  policyTypes:
+    - Ingress
