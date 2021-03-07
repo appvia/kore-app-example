@@ -3,7 +3,7 @@ NAME=kore-example
 AUTHOR ?= appvia
 AUTHOR_EMAIL=kore@appvia.io
 REGISTRY=quay.io
-ROOT_DIR=${PWD}
+VERSION ?= latest
 
 .PHONY: build release
 
@@ -11,9 +11,9 @@ default: build
 
 build:
 	@echo "--> Building docker image"
-	docker build -t ${REGISTRY}/${AUTHOR}/${NAME} -f images/Dockerfile .
+	docker build -t ${REGISTRY}/${AUTHOR}/${NAME}:${VERSION} -f images/Dockerfile .
 
-release: build
+release:
 	@docker push ${REGISTRY}/${AUTHOR}/${NAME}:${VERSION}
 
 verify-circleci:

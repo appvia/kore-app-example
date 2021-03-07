@@ -8,15 +8,15 @@ jobs:
       AUTHOR: appvia
       IMAGE: kore-example
     docker:
-      - image: docker:19.03-dind
+      - image: circleci/golang:1.15
     steps:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
-          name: Publishing UI to quay.io
+          name: Building Image
           command: |
-            docker build -t ${REGISTRY}/${AUTHOR}/${IMAGE}:${CIRCLE_TAG:-latest} -f images/Dockerfile .
+            VERSION=${CIRCLE_TAG:-latest} make
 
   publish:
     environment:
@@ -24,7 +24,7 @@ jobs:
       AUTHOR: appvia
       IMAGE: kore-example
     docker:
-      - image: docker:19.03-dind
+      - image: circleci/golang:1.15
     steps:
       - checkout
       - setup_remote_docker:
@@ -33,7 +33,8 @@ jobs:
           name: Publishing Images to registry
           command: |
             docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD} ${REGISTRY}
-            docker push ${REGISTRY}/${AUTHOR}/${IMAGE}:${CIRCLE_TAG:-latest}
+            VERSION=${CIRCLE_TAG:-latest} make
+            VERSION=${CIRCLE_TAG:-latest} make release
 
   deploy:
     docker:
@@ -59,8 +60,6 @@ workflows:
               only: master
             tags:
               only: /^v.*$/
-          requires:
-            - build
       - deploy:
           filters:
             branches:
@@ -68,5 +67,4 @@ workflows:
             tags:
               only: /^v.*$/
           requires:
-            - build
             - publish
