@@ -6,7 +6,7 @@ jobs:
     environment:
       REGISTRY: quay.io
       AUTHOR: appvia
-      IMAGE: kore-exmaple
+      IMAGE: kore-example
     docker:
       - image: docker:19.03-dind
     steps:
@@ -22,7 +22,7 @@ jobs:
     environment:
       REGISTRY: quay.io
       AUTHOR: appvia
-      IMAGE: kore-exmaple
+      IMAGE: kore-example
     docker:
       - image: docker:19.03-dind
     steps:
