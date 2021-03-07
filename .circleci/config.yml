@@ -37,14 +37,21 @@ jobs:
             VERSION=${CIRCLE_TAG:-latest} make release
 
   deploy:
+    environment:
+      CLUSTER: rohith
+      KORE_TEAM: rohith-qa
     docker:
       - image: quay.io/appvia/kore:rohith
     steps:
       - checkout
       - run:
+          name: Configuration Kubeconfig
+          command: |
+            kore kubeconfig --cluster ${CLUSTER} --non-interactive
+      - run:
           name: Deploying application
           command: |
-            echo "hello"
+            kubectl --context ${KORE_TEAM}.${CLUSTER} get no
 
 workflows:
   version: 2.1
