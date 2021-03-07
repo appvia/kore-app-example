@@ -51,7 +51,7 @@ jobs:
       - run:
           name: Deploying application
           command: |
-            kubectl --context ${KORE_TEAM}.${CLUSTER} apply -f kube/deployment.yml
+            kubectl --context ${KORE_TEAM}.${CLUSTER} -n app apply -f kube/deployment.yml
 
 workflows:
   version: 2.1
