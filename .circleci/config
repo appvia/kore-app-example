@@ -1,0 +1,72 @@
+---
+version: 2.1
+
+jobs:
+  build:
+    environment:
+      REGISTRY: quay.io
+      AUTHOR: appvia
+      IMAGE: kore-exmaple
+    docker:
+      - image: docker:19.03-dind
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Publishing UI to quay.io
+          command: |
+            docker build -t ${REGISTRY}/${AUTHOR}/${IMAGE}:${CIRCLE_TAG:-latest} images/Dockerfile .
+
+  publish:
+    environment:
+      REGISTRY: quay.io
+      AUTHOR: appvia
+      IMAGE: kore-exmaple
+    docker:
+      - image: docker:19.03-dind
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Publishing Images to registry
+          command: |
+            docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD} ${REGISTRY}
+            docker push ${REGISTRY}/${AUTHOR}/${IMAGE}:${CIRCLE_TAG:-latest}
+
+  deploy:
+    docker:
+      - image: quay.io/appvia/kore:latest
+    steps:
+      - checkout
+      - run:
+          name: Deploying application
+          command: |
+            echo "hello
+
+workflows:
+  version: 2.1
+  workflow:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /^v.*$/
+      - publish:
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^v.*$/
+            requires:
+              - build
+      - deploy:
+          filters:
+            branches:
+              only: master
+            tags:
+              only: /^v.*$/
+            requires:
+              - build
+              - publish

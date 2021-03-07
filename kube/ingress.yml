@@ -1,0 +1,41 @@
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: "prod-le-http01"
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    kubernetes.io/ingress.class: "external"
+  name: app
+spec:
+  rules:
+  - host: app.labs.kore.appvia.io
+    http:
+      paths:
+      - backend:
+          serviceName: app
+          servicePort: 443
+        path: /
+  tls:
+  - hosts:
+    - app.labs.kore.appvia.io
+    secretName: tls
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ingress
+spec:
+  podSelector:
+    matchLabels:
+      name: app
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: kore-ingress
+    ports:
+    - protocol: TCP
+      port: 10443

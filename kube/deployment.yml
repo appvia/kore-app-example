@@ -1,0 +1,75 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+spec:
+  type: ClusterIP
+  ports:
+    - name: https
+      port: 443
+      targetPort: 10443
+  selector:
+    name: app
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        name: app
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsNonRoot: true
+      containers:
+      - name: httpbin
+        image: kennethreitz/httpbin
+        command:
+        - gunicorn
+        - -b
+        - 0.0.0.0:10080
+        - httpbin:app
+        - -k
+        - gevent
+      - name: app
+        image: quay.io/appvia/kore-example:latest
+        resources:
+          limits:
+            cpu: 20m
+            memory: 64
+          requests:
+            cpu: 2m
+            memory: 8
+        env:
+        - name: PROXY_SERVICE_HOST
+          value: "127.0.0.1"
+        - name: PROXY_SERVICE_PORT=80
+          value: "10080"
+        ports:
+        - name: https
+          containerPort: 10443
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 10443
+            scheme: HTTPS
+          initialDelaySeconds: 20
+          successThreshold: 3
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 10443
+            scheme: HTTPS
+          initialDelaySeconds: 360
+          timeoutSeconds: 10
