@@ -38,7 +38,7 @@ jobs:
 
   deploy:
     docker:
-      - image: quay.io/appvia/kore:latest
+      - image: quay.io/appvia/kore:rohith
     steps:
       - checkout
       - run:
