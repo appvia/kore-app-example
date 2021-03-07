@@ -43,7 +43,7 @@ jobs:
       - run:
           name: Deploying application
           command: |
-            echo "hello
+            echo "hello"
 
 workflows:
   version: 2.1
