@@ -16,7 +16,7 @@ jobs:
       - run:
           name: Publishing UI to quay.io
           command: |
-            docker build -t ${REGISTRY}/${AUTHOR}/${IMAGE}:${CIRCLE_TAG:-latest} images/Dockerfile .
+            docker build -t ${REGISTRY}/${AUTHOR}/${IMAGE}:${CIRCLE_TAG:-latest} -f images/Dockerfile .
 
   publish:
     environment:
