@@ -28,7 +28,7 @@ We simply need to add the secrets below into CI.
 ```
 KORE_SERVER=http://<api>
 KORE_TEAM=<team>
-KORE_REFRESH_TOKEN=<token from file generate by kore create robot>
+KORE_TOKEN=<token from file generate by kore create robot>
 ```
 
 Alternatively you can use entire file as a secret (either base64 or direct depending on CI) and as a secret.
